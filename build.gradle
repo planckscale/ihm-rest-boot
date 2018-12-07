@@ -1,10 +1,10 @@
 buildscript {
 	ext {
 		springBootVersion = '2.1.1.RELEASE'
-	}
+    }
 	repositories {
 		mavenCentral()
-	}
+    }
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	}
@@ -15,10 +15,12 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'jacoco'
 
 group = 'com.home.ihm'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
 	mavenCentral()
@@ -31,14 +33,35 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-security')
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	runtimeOnly('com.h2database:h2')
-	compileOnly('org.projectlombok:lombok')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	testImplementation('org.springframework.security:spring-security-test')
 	compile 'io.springfox:springfox-swagger2:2.9.2'
 	compile 'io.springfox:springfox-swagger-ui:2.9.2'
-	testCompile "junit:junit:4.12"
+	testCompile "junit:junit:4.12" // Initialzr had 4.11, incompatible with it's own generated test!
+    compile 'org.apache.commons:commons-lang3:3.7'
+    //compileOnly('org.projectlombok:lombok')
+    compileOnly 'org.projectlombok:lombok:1.16.20' // Downgraded! All kinds of problems with gradle and or/boot2
+    annotationProcessor 'org.projectlombok:lombok:1.16.20'
 }
-//group 'com.home.ihm'
-//version '1.0-SNAPSHOT'
 
+// Coverage (Jacoco)
+jacocoTestCoverageVerification {
 
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90
+            }
+        }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.enabled true
+    }
+}
+
+build.dependsOn jacocoTestReport, jacocoTestCoverageVerification

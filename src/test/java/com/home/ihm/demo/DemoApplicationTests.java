@@ -13,4 +13,8 @@ public class DemoApplicationTests {
 	public void contextLoads() {
 	}
 
+	@Test
+	public void applicationContextTest() {
+		DemoApplication.main(new String[] {});
+	}
 }
