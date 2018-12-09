@@ -6,11 +6,14 @@ Run SpringBoot application and access http://localhost:8080/swagger-ui.html (see
 Actuator monitoring is running on port 8090. 
 Examples:
 ```
-curl http://localhost:8080/actuator/info
+curl http://localhost:8090/actuator/health
 ```
+> {"status":"UP"}
 ```
-curl http://localhost:8080/actuator/health
+curl http://localhost:8090/actuator/info
 ```
+> {"app":{"name":"IHM Spring Boot 2 REST Service","description":"iHeartMedia Demo Project"},"java-vendor":"Oracle Corporation"}
+
 
 ## Build and run (unix like system)
 
