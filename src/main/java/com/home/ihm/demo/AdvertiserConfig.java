@@ -1,17 +1,13 @@
 package com.home.ihm.demo;
 
-import com.home.ihm.demo.service.AdvertiserService;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @EnableAutoConfiguration
 @Configuration
+@ComponentScan("com.home.ihm.demo.service")
 public class AdvertiserConfig {
 
-    @Bean
-    AdvertiserService advertiserService() {
-        return new AdvertiserService();
-    }
 }
 

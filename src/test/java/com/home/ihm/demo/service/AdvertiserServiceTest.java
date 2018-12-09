@@ -14,13 +14,10 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.math.BigDecimal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { AdvertiserConfig.class }, loader = AnnotationConfigContextLoader.class)
@@ -68,15 +65,17 @@ public class AdvertiserServiceTest {
     @Test
     public void isCreditWorthy() throws Exception {
         Advertiser advertiser = Mockito.mock(Advertiser.class);
+        when(repository.getOne(advertiser.getId())).thenReturn(advertiser);
         when(advertiser.getCreditLimt()).thenReturn(1000L);
-        assertTrue(service.isCreditWorthy( advertiser, new BigDecimal(999) ));
+        assertTrue(service.isCreditWorthy(advertiser.getId(), 999L));
     }
 
     @Test
     public void isNotCreditWorthy() throws Exception {
         Advertiser advertiser = Mockito.mock(Advertiser.class);
+        when(repository.getOne(advertiser.getId())).thenReturn(advertiser);
         when(advertiser.getCreditLimt()).thenReturn(1000L);
-        assertFalse(service.isCreditWorthy( advertiser, new BigDecimal(1001) ));
+        assertFalse(service.isCreditWorthy(advertiser.getId(), 1001L));
     }
 
 

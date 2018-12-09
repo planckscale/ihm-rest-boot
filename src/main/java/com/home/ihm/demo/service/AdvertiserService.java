@@ -40,8 +40,9 @@ public class AdvertiserService {
         return;
     }
 
-    public boolean isCreditWorthy(Advertiser advertiser, BigDecimal debitAmount) {
-        return BigDecimal.valueOf(advertiser.getCreditLimt()).compareTo(debitAmount) >= 0;
+    public boolean isCreditWorthy(Long advertiserId, Long debitAmount) {
+        Advertiser advertiser = repository.getOne(advertiserId);
+        return advertiser.getCreditLimt().compareTo(debitAmount) >= 0;
     }
 
 }
