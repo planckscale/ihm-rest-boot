@@ -22,7 +22,7 @@ curl http://localhost:8090/actuator/info
 
 
 ## Build and run (unix like system)
-Build will run tests and coverage verification and reporting (set at 90%, report in /build/reports/jacoco/test/html/index.html)
+Build will run tests and coverage verification and reporting (set at 90%, report in /build/reports/jacoco/test/html/index.html). Note most relevant source files are in `/src/main/java` and `/src/test/java`. The gradle build file, Dockerfile, lombok config and this readme file are in the root directory.
 
 ```
 git clone https://github.com/planckscale/ihm-rest-boot.git
