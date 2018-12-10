@@ -16,15 +16,23 @@ curl http://localhost:8090/actuator/info
 
 
 ## Build and run (unix like system)
+Build will run tests and coverage verification and reporting (set at 90%, report in /build/reports/jacoco/test/html/index.html)
 
 ```
 git clone https://github.com/planckscale/ihm-rest-boot.git
 cd ihm-rest-boot.git
+./gradlew clean build
 ./gradlew bootRun
 ```
 
-## Excutable jar can be run as well (standalone)
+## Run as excutable jar (standalone)
 ```
 ./gradlew bootJar
 java -jar build/libs/boot-rest-demo-0.0.1-SNAPSHOT.jar
+```
+
+## Run as Docker container
+```
+docker build . -t boot-rest-demo-0.0.1
+docker run -p 8080:8080 -p 8090:8090 boot-rest-demo-0.0.1:latest
 ```
