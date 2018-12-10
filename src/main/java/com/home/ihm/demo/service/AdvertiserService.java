@@ -1,5 +1,6 @@
 package com.home.ihm.demo.service;
 
+import com.home.ihm.demo.ResourceNotFoundException;
 import com.home.ihm.demo.domain.Advertiser;
 import com.home.ihm.demo.repository.AdvertiserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ public class AdvertiserService {
 
     @Transactional(readOnly = true)
     public Advertiser show(Long id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Advertiser not found for this id: " + id));
+        Optional<Advertiser> advertiser = repository.findById(id);
+        if (!advertiser.isPresent()) throw new ResourceNotFoundException("Advertiser not found for this id: " + id);
+        return advertiser.get();
     }
 
     public Advertiser create(Advertiser advertiser) {
@@ -28,11 +31,12 @@ public class AdvertiserService {
 
     public Advertiser update(Long id, Advertiser advertiser) {
 
-        Advertiser existing = repository.findById(id).orElseThrow(() -> new RuntimeException("Advertiser not found for this id: " + id));
+        Optional<Advertiser> existing = repository.findById(id);
+        if (!existing.isPresent()) throw new ResourceNotFoundException("Advertiser not found for this id: " + id);
 
-        existing.setName(advertiser.getName());
-        existing.setContactName(advertiser.getContactName());
-        existing.setCreditLimt(advertiser.getCreditLimt());
+        existing.get().setName(advertiser.getName());
+        existing.get().setContactName(advertiser.getContactName());
+        existing.get().setCreditLimt(advertiser.getCreditLimt());
 
         return repository.save(advertiser);
     }
@@ -48,8 +52,9 @@ public class AdvertiserService {
     }
 
     public boolean isCreditWorthy(Long advertiserId, Long debitAmount) {
-        Advertiser advertiser = repository.findById(advertiserId).orElseThrow(() -> new RuntimeException("Advertiser not found for this id: " + advertiserId));
-        return advertiser.getCreditLimt().compareTo(debitAmount) >= 0;
+        Optional<Advertiser> advertiser = repository.findById(advertiserId);
+        if (!advertiser.isPresent()) throw new ResourceNotFoundException("Advertiser not found for this id: " + advertiserId);
+        return advertiser.get().getCreditLimt().compareTo(debitAmount) >= 0;
     }
 
 }

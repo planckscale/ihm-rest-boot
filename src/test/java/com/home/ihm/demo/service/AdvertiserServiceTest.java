@@ -1,6 +1,7 @@
 package com.home.ihm.demo.service;
 
 import com.home.ihm.demo.AdvertiserConfig;
+import com.home.ihm.demo.ResourceNotFoundException;
 import com.home.ihm.demo.domain.Advertiser;
 import com.home.ihm.demo.repository.AdvertiserRepository;
 import org.junit.Test;
@@ -12,7 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,16 +43,31 @@ public class AdvertiserServiceTest {
     @Test
     public void show() throws Exception {
         Advertiser advertiser =  Mockito.mock(Advertiser.class);
+        when(repository.findById(advertiser.getId())).thenReturn(Optional.of(advertiser));
         service.show(advertiser.getId());
-        verify(repository, times(1)).getOne(advertiser.getId());
+        verify(repository, times(1)).findById(advertiser.getId());
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void showShouldThrow() throws Exception {
+        Advertiser advertiser = Mockito.mock(Advertiser.class);
+        given(repository.findById(advertiser.getId())).willReturn(Optional.empty());
+        service.show(advertiser.getId());
     }
 
     @Test
     public void update() throws Exception {
         Advertiser advertiser = Mockito.mock(Advertiser.class);
-        given(repository.getOne(advertiser.getId())).willReturn(advertiser);
+        given(repository.findById(advertiser.getId())).willReturn(Optional.of(advertiser));
         service.update(advertiser.getId(), advertiser);
         verify(repository, times(1)).save(advertiser);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void updateShouldThrow() throws Exception {
+        Advertiser advertiser = Mockito.mock(Advertiser.class);
+        given(repository.findById(advertiser.getId())).willReturn(Optional.empty());
+        service.update(advertiser.getId(), advertiser);
     }
 
     @Test
@@ -60,12 +77,20 @@ public class AdvertiserServiceTest {
         verify(repository, times(1)).deleteById(advertiser.getId());
     }
 
+    @Test
+    public void showAll() throws Exception {
+        Advertiser advertiser =  Mockito.mock(Advertiser.class);
+        when(repository.findAll()).thenReturn(Arrays.asList(advertiser));
+        service.showAll();
+        verify(repository, times(1)).findAll();
+    }
+
     /* Logic */
 
     @Test
     public void isCreditWorthy() throws Exception {
         Advertiser advertiser = Mockito.mock(Advertiser.class);
-        when(repository.getOne(advertiser.getId())).thenReturn(advertiser);
+        when(repository.findById(advertiser.getId())).thenReturn(Optional.of(advertiser));
         when(advertiser.getCreditLimt()).thenReturn(1000L);
         assertTrue(service.isCreditWorthy(advertiser.getId(), 999L));
     }
@@ -73,10 +98,16 @@ public class AdvertiserServiceTest {
     @Test
     public void isNotCreditWorthy() throws Exception {
         Advertiser advertiser = Mockito.mock(Advertiser.class);
-        when(repository.getOne(advertiser.getId())).thenReturn(advertiser);
+        when(repository.findById(advertiser.getId())).thenReturn(Optional.of(advertiser));
         when(advertiser.getCreditLimt()).thenReturn(1000L);
         assertFalse(service.isCreditWorthy(advertiser.getId(), 1001L));
     }
 
+    @Test(expected = ResourceNotFoundException.class)
+    public void validationShouldThrow() throws Exception {
+        Advertiser advertiser = Mockito.mock(Advertiser.class);
+        given(repository.findById(advertiser.getId())).willReturn(Optional.empty());
+        service.isCreditWorthy(advertiser.getId(), 999L);
+    }
 
 }

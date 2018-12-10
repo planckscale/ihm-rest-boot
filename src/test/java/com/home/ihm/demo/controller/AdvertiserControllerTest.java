@@ -4,23 +4,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.home.ihm.demo.domain.Advertiser;
 import com.home.ihm.demo.service.AdvertiserService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -108,17 +108,17 @@ public class AdvertiserControllerTest {
                 .andExpect(jsonPath("valid_credit", is(true)));
     }
 
-
-    @Ignore("TODO implement Spring glabal exception handle")
     @Test
-    public void shouldNotExposeException() throws Exception {
+    public void showAll() throws Exception {
 
         Advertiser advertiser = createAdvertiser();
-        doThrow(JpaObjectRetrievalFailureException.class).when(service).show(advertiser.getId());
+        given(service.showAll()).willReturn(Arrays.asList(advertiser));
 
-        mvc.perform(get("/api/advertiser/"+advertiser.getId())
+        mvc.perform(get("/api/advertiser")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotFound()); // expect 404, not 500 with exception
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
+
     }
 
 

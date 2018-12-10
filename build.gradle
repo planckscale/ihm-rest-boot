@@ -61,6 +61,18 @@ jacocoTestReport {
         csv.enabled false
         html.enabled true
     }
+
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: ['codeeval/**',
+                              'crackingthecode/part3knowledgebased/**',
+                              '**/Chapter7ObjectOrientedDesign**',
+                              '**/Chapter11Testing**',
+                              '**/Chapter12SystemDesignAndMemoryLimits**',
+                              'projecteuler/**','**/RestExceptionHandler**', '**/DemoApplication**'])
+        })
+    }
 }
 
 build.dependsOn jacocoTestReport, jacocoTestCoverageVerification
