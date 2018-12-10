@@ -65,12 +65,7 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it,
-                    exclude: ['codeeval/**',
-                              'crackingthecode/part3knowledgebased/**',
-                              '**/Chapter7ObjectOrientedDesign**',
-                              '**/Chapter11Testing**',
-                              '**/Chapter12SystemDesignAndMemoryLimits**',
-                              'projecteuler/**','**/RestExceptionHandler**', '**/DemoApplication**'])
+                    exclude: ['**/RestExceptionHandler**', '**/DemoApplication**'])
         })
     }
 }

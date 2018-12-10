@@ -20,9 +20,7 @@ public class AdvertiserService {
 
     @Transactional(readOnly = true)
     public Advertiser show(Long id) {
-        Optional<Advertiser> advertiser = repository.findById(id);
-        if (!advertiser.isPresent()) throw new ResourceNotFoundException("Advertiser not found for this id: " + id);
-        return advertiser.get();
+        return getAdvertiser(id);
     }
 
     public Advertiser create(Advertiser advertiser) {
@@ -31,12 +29,11 @@ public class AdvertiserService {
 
     public Advertiser update(Long id, Advertiser advertiser) {
 
-        Optional<Advertiser> existing = repository.findById(id);
-        if (!existing.isPresent()) throw new ResourceNotFoundException("Advertiser not found for this id: " + id);
+        Advertiser existing = getAdvertiser(id);
 
-        existing.get().setName(advertiser.getName());
-        existing.get().setContactName(advertiser.getContactName());
-        existing.get().setCreditLimt(advertiser.getCreditLimt());
+        existing.setName(advertiser.getName());
+        existing.setContactName(advertiser.getContactName());
+        existing.setCreditLimt(advertiser.getCreditLimt());
 
         return repository.save(advertiser);
     }
@@ -52,9 +49,13 @@ public class AdvertiserService {
     }
 
     public boolean isCreditWorthy(Long advertiserId, Long debitAmount) {
+        return getAdvertiser(advertiserId).getCreditLimt().compareTo(debitAmount) >= 0;
+    }
+
+    private Advertiser getAdvertiser(Long advertiserId) {
         Optional<Advertiser> advertiser = repository.findById(advertiserId);
         if (!advertiser.isPresent()) throw new ResourceNotFoundException("Advertiser not found for this id: " + advertiserId);
-        return advertiser.get().getCreditLimt().compareTo(debitAmount) >= 0;
+        return advertiser.get();
     }
 
 }

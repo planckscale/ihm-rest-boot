@@ -3,6 +3,8 @@ package com.home.ihm.demo.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.home.ihm.demo.domain.Advertiser;
+import com.home.ihm.demo.dto.DebitCommand;
+import com.home.ihm.demo.dto.DebitEvent;
 import com.home.ihm.demo.service.AdvertiserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -119,6 +121,44 @@ public class AdvertiserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
 
+    }
+
+    @Test
+    public void debit() throws Exception {
+
+        Long debitAmount = 999L;
+        boolean succeeded = true;
+        Advertiser advertiser = createAdvertiser();
+
+        DebitCommand debitRequest = DebitCommand.builder().advertiserId(advertiser.getId()).amount(debitAmount).build();
+        DebitEvent debitResponse = DebitEvent.builder().succeeded(succeeded).build();
+
+        given(service.isCreditWorthy(advertiser.getId(), debitAmount)).willReturn(succeeded);
+
+        mvc.perform(post("/api/advertiser/debit")
+                .content(new ObjectMapper().writeValueAsString(debitRequest))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("succeeded", is(debitResponse.isSucceeded())));
+    }
+
+    @Test
+    public void debitOverLimit() throws Exception {
+
+        Long debitAmount = 1001L;
+        boolean failed = false;
+        Advertiser advertiser = createAdvertiser();
+
+        DebitCommand debitRequest = DebitCommand.builder().advertiserId(advertiser.getId()).amount(debitAmount).build();
+        DebitEvent debitResponse = DebitEvent.builder().succeeded(failed).build();
+
+        given(service.isCreditWorthy(advertiser.getId(), debitAmount)).willReturn(failed);
+
+        mvc.perform(post("/api/advertiser/debit")
+                .content(new ObjectMapper().writeValueAsString(debitRequest))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("succeeded", is(debitResponse.isSucceeded())));
     }
 
 
