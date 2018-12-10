@@ -23,6 +23,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -126,16 +127,17 @@ public class AdvertiserControllerTest {
     @Test
     public void debit() throws Exception {
 
-        Long debitAmount = 999L;
         boolean succeeded = true;
         Advertiser advertiser = createAdvertiser();
+        Long deduction = advertiser.getCreditLimt() - (advertiser.getCreditLimt() - 1);
 
-        DebitCommand debitRequest = DebitCommand.builder().advertiserId(advertiser.getId()).amount(debitAmount).build();
+        DebitCommand debitRequest = DebitCommand.builder().advertiserId(advertiser.getId()).amount(deduction).build();
         DebitEvent debitResponse = DebitEvent.builder().succeeded(succeeded).build();
 
-        given(service.isCreditWorthy(advertiser.getId(), debitAmount)).willReturn(succeeded);
+        given(service.show(advertiser.getId())).willReturn(advertiser);
+        given(service.deductCredit(advertiser.getId(), deduction)).willReturn(anyLong());
 
-        mvc.perform(post("/api/advertiser/debit")
+        mvc.perform(post("/api/advertiser/deductCredit")
                 .content(new ObjectMapper().writeValueAsString(debitRequest))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -145,16 +147,17 @@ public class AdvertiserControllerTest {
     @Test
     public void debitOverLimit() throws Exception {
 
-        Long debitAmount = 1001L;
         boolean failed = false;
         Advertiser advertiser = createAdvertiser();
+        Long deduction = advertiser.getCreditLimt() + 1;
 
-        DebitCommand debitRequest = DebitCommand.builder().advertiserId(advertiser.getId()).amount(debitAmount).build();
+        DebitCommand debitRequest = DebitCommand.builder().advertiserId(advertiser.getId()).amount(deduction).build();
         DebitEvent debitResponse = DebitEvent.builder().succeeded(failed).build();
 
-        given(service.isCreditWorthy(advertiser.getId(), debitAmount)).willReturn(failed);
+        given(service.show(advertiser.getId())).willReturn(advertiser);
+        doThrow(IllegalArgumentException.class).when(service).deductCredit(advertiser.getId(), deduction);
 
-        mvc.perform(post("/api/advertiser/debit")
+        mvc.perform(post("/api/advertiser/deductCredit")
                 .content(new ObjectMapper().writeValueAsString(debitRequest))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())

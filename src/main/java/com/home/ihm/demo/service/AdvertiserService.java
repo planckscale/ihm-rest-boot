@@ -48,9 +48,20 @@ public class AdvertiserService {
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public boolean isCreditWorthy(Long advertiserId, Long debitAmount) {
         return getAdvertiser(advertiserId).getCreditLimt().compareTo(debitAmount) >= 0;
     }
+
+    public Long deductCredit(Long advertiserId, Long deduction) {
+        Advertiser advertiser = getAdvertiser(advertiserId);
+        Long balance = advertiser.getCreditLimt() - deduction;
+        if (balance < 0) throw new IllegalArgumentException("deduction exceeds credit limit");
+        advertiser.setCreditLimt(balance);
+        update(balance, advertiser);
+        return balance;
+    }
+
 
     private Advertiser getAdvertiser(Long advertiserId) {
         Optional<Advertiser> advertiser = repository.findById(advertiserId);

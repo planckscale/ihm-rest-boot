@@ -66,16 +66,25 @@ public class AdvertiserController {
         return advertiserService.showAll();
     }
 
-    @PostMapping("/debit")
+    @PostMapping("/deductCredit")
     @ApiOperation(value = "Debit with validation", response = DebitEvent.class)
     DebitEvent debit(@RequestBody DebitCommand debit) {
 
-        boolean creditWorthy = advertiserService.isCreditWorthy(debit.getAdvertiserId(), debit.getAmount());
-        String message = creditWorthy ? "Debit of %d succeeded" : "Debit of %d exceeds credit limit";
+        boolean isDeducted = false;
+        Long balance = advertiserService.show(debit.getAdvertiserId()).getCreditLimt();
+        try {
+            balance = advertiserService.deductCredit(debit.getAdvertiserId(), debit.getAmount());
+            isDeducted = true;
+        }
+        catch (IllegalArgumentException e) {}
+
+        String message = isDeducted
+                ? "Deduction of %d succeeded, balance %d"
+                : "Deduction of %d failed, exceeds credit limit of %d";
 
         return DebitEvent.builder()
-                .succeeded(creditWorthy ? true : false)
-                .message(String.format(message, debit.getAmount()))
+                .succeeded(isDeducted)
+                .message(String.format(message, debit.getAmount(), balance))
                 .build();
     }
 
