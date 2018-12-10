@@ -2,6 +2,12 @@
 Spring Boot REST service
 
 Run SpringBoot application and access http://localhost:8080/swagger-ui.html (see below for how to run). This will allow running endpoints from the Swagger API browser. There are some sample Advertisers for viewing but can create new ones through the API browser as well. 
+Example:
+```
+curl -X POST http://localhost:8080/api/advertiser --data '{"name":"Advertiser ABC", "contactName":"Johnny Test", "creditLimit":10000}' -H "Content-Type: application/json"
+```
+> {"id":14,"name":"Advertiser ABC","contactName":"Johnny Test","creditLimt":10000}
+
 
 Actuator monitoring is running on port 8090. 
 Examples:
