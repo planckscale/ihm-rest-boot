@@ -58,7 +58,7 @@ public class AdvertiserService {
         Long balance = advertiser.getCreditLimt() - deduction;
         if (balance < 0) throw new IllegalArgumentException("deduction exceeds credit limit");
         advertiser.setCreditLimt(balance);
-        update(balance, advertiser);
+        repository.save(advertiser);
         return balance;
     }
 

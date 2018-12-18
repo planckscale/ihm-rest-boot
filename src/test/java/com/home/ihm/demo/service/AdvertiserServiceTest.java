@@ -111,13 +111,12 @@ public class AdvertiserServiceTest {
         service.isCreditWorthy(advertiser.getId(), 999L);
     }
 
-    @Ignore("fix test, getting tired")
     @Test
     public void deductCredit() throws Exception {
         Advertiser advertiser = Mockito.mock(Advertiser.class);
         when(repository.findById(advertiser.getId())).thenReturn(Optional.of(advertiser));
         when(advertiser.getCreditLimt()).thenReturn(1000L);
-        given(repository.save(advertiser)).willReturn(advertiser);
+        service.deductCredit(advertiser.getId(), 999L);
         verify(repository, times(1)).save(advertiser);
     }
 
